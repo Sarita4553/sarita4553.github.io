@@ -1,24 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>OneSignal Registration</title>
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-      window.OneSignal = window.OneSignal || [];
-      OneSignal.push(function () {
-        OneSignal.init({
-          appId: "d2783680-973f-459a-8550-686b0f9c77b4", // ✅ Your App ID
-          notifyButton: {
-            enable: true
-          }
-        });
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneSignal Registration</title>
 
-        OneSignal.showSlidedownPrompt(); // 🔔 Show prompt immediately
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+
+  <script>
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function () {
+      OneSignal.init({
+        appId: "d2783680-973f-459a-8550-686b0f9c77b4", // ✅ Your OneSignal App ID
+        notifyButton: {
+          enable: true,
+        },
       });
-    </script>
-  </head>
-  <body>
-    <h2>📲 Push Notification Test</h2>
-    <p>Please accept the browser notification prompt when it appears.</p>
-  </body>
+
+      // Show the prompt immediately
+      OneSignal.showSlidedownPrompt();
+
+      // Wait for subscription to be completed
+      OneSignal.on('subscriptionChange', async function (isSubscribed) {
+        if (isSubscribed) {
+          const playerId = await OneSignal.getUserId();
+          console.log("✅ Player ID:", playerId);
+          alert("✅ Push Registered!\nPlayer ID:\n" + playerId);
+
+          // 🔁 OPTIONAL: Send Player ID to Adalo via API
+          // fetch("https://your-adalo-api.com/users/USER_ID", {
+          //   method: "PATCH",
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //     "Authorization": "Bearer YOUR_ADALO_API_KEY"
+          //   },
+          //   body: JSON.stringify({ player_id: playerId })
+          // });
+
+        } else {
+          console.log("❌ User did not subscribe.");
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <h2>📲 Push Notification Setup</h2>
+  <p>This page will prompt you to allow browser push notifications.<br/>
+  Once accepted, you will see your unique OneSignal Player ID.</p>
+</body>
 </html>
