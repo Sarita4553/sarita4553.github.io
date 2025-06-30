@@ -22,10 +22,8 @@
         }
       });
 
-      // Automatically show the browser permission prompt
       OneSignal.showSlidedownPrompt();
 
-      // When subscription state changes
       OneSignal.on("subscriptionChange", function (isSubscribed) {
         console.log("Subscription changed:", isSubscribed);
 
@@ -35,23 +33,22 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const userId = urlParams.get("userId");
-             console.log("userId ID:", userId);
+            console.log("User ID:", userId);
+
             if (userId && playerId) {
-              console.log("Sending to Google Apps Script...");
-              fetch("https://script.google.com/macros/s/AKfycbw3WqXWQwjm60cmS9bVxSZhJuCOwBl1a18nqccOJ2J-hwtehqVD2rv1XDh8hgI-a9IVog/exec", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ userId, playerId })
-              })
-              .then(() => {
-                document.body.innerHTML = "<h2>✅ Device Registered Successfully</h2>";
-              })
-              .catch((error) => {
-                console.error("Error sending data:", error);
-                document.body.innerHTML = "<h2>❌ Failed to register device</h2>";
-              });
+              const endpoint = "https://script.google.com/macros/s/AKfycbyujkQvd_1jWe5EAXZDXzY9cz2TZyiAk8fq-QURJ1yEne2ht_ycxZsYDWxrW782u3p9AA/exec";
+              const queryString = `?userId=${encodeURIComponent(userId)}&playerId=${encodeURIComponent(playerId)}`;
+
+              fetch(endpoint + queryString)
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log("Response:", data);
+                  document.body.innerHTML = "<h2>✅ Device Registered Successfully</h2>";
+                })
+                .catch((error) => {
+                  console.error("Error sending data:", error);
+                  document.body.innerHTML = "<h2>❌ Failed to register device</h2>";
+                });
             } else {
               document.body.innerHTML = "<h2>⚠️ Missing userId or playerId</h2>";
             }
