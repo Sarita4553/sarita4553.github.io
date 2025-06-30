@@ -1,53 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OneSignal Registration</title>
-
-  <!-- OneSignal SDK -->
+  <title>OneSignal Register</title>
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-
   <script>
     window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function () {
+    OneSignal.push(function() {
       OneSignal.init({
-        appId: "d2783680-973f-459a-8550-686b0f9c77b4", // ✅ Your OneSignal App ID
-        notifyButton: {
-          enable: true,
-        },
+        appId: "d2783680-973f-459a-8550-686b0f9c77b4",
       });
 
-      // Show the prompt immediately
-      OneSignal.showSlidedownPrompt();
-
-      // Wait for subscription to be completed
-      OneSignal.on('subscriptionChange', async function (isSubscribed) {
+      OneSignal.on("subscriptionChange", function(isSubscribed) {
         if (isSubscribed) {
-          const playerId = await OneSignal.getUserId();
-          console.log("✅ Player ID:", playerId);
-          alert("✅ Push Registered!\nPlayer ID:\n" + playerId);
+          OneSignal.getUserId().then(function(playerId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get("userId");
 
-          // 🔁 OPTIONAL: Send Player ID to Adalo via API
-          // fetch("https://your-adalo-api.com/users/USER_ID", {
-          //   method: "PATCH",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //     "Authorization": "Bearer YOUR_ADALO_API_KEY"
-          //   },
-          //   body: JSON.stringify({ player_id: playerId })
-          // });
-
+            if (userId && playerId) {
+              fetch("https://script.google.com/macros/s/AKfycbySkTTqF-tyPWtv3qrWWxxp1VrD4W2MyVPU1C1LCBI_MRn8sCtjtbvCD1igQ3ykIs86ag/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, playerId })
+              }).then(() => {
+                document.body.innerHTML = "<h2>Device Registered</h2>";
+              }).catch(() => {
+                document.body.innerHTML = "<h2>Error registering device</h2>";
+              });
+            } else {
+              document.body.innerHTML = "<h2>Error: Missing userId or playerId</h2>";
+            }
+          });
         } else {
-          console.log("❌ User did not subscribe.");
+          document.body.innerHTML = "<h2>Please enable notifications</h2>";
         }
       });
     });
   </script>
 </head>
 <body>
-  <h2>📲 Push Notification Setup</h2>
-  <p>This page will prompt you to allow browser push notifications.<br/>
-  Once accepted, you will see your unique OneSignal Player ID.</p>
+  <h2>Enabling Notifications...</h2>
 </body>
 </html>
