@@ -1,49 +1,69 @@
-<script>
-  window.OneSignal = window.OneSignal || [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register for Push Notifications</title>
 
-  console.log("OneSignal setup starting...");
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
 
-  OneSignal.push(function () {
-    console.log("OneSignal init firing...");
+  <script>
+    window.OneSignal = window.OneSignal || [];
 
-    OneSignal.init({
-      appId: "d2783680-973f-459a-8550-686b0f9c77b4",
-    });
+    OneSignal.push(function () {
+      console.log("Initializing OneSignal...");
 
-    console.log("OneSignal initialized.");
-
-    OneSignal.on("subscriptionChange", function (isSubscribed) {
-      console.log("subscriptionChange event fired:", isSubscribed);
-
-      if (isSubscribed) {
-        OneSignal.getUserId().then(function (playerId) {
-          console.log("Received playerId:", playerId);
-          const urlParams = new URLSearchParams(window.location.search);
-          const userId = urlParams.get("userId");
-
-          if (userId && playerId) {
-            console.log("Sending data to script...");
-            fetch("https://script.google.com/macros/s/AKfycbySkTTqF-tyPWtv3qrWWxxp1VrD4W2MyVPU1C1LCBI_MRn8sCtjtbvCD1igQ3ykIs86ag/exec", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ userId, playerId })
-            }).then(() => {
-              document.body.innerHTML = "<h2>Device Registered</h2>";
-            }).catch((e) => {
-              document.body.innerHTML = "<h2>Error registering device</h2>";
-              console.error("Fetch error:", e);
-            });
-          } else {
-            document.body.innerHTML = "<h2>Error: Missing userId or playerId</h2>";
-            console.error("Missing userId or playerId");
+      OneSignal.init({
+        appId: "d2783680-973f-459a-8550-686b0f9c77b4",
+        promptOptions: {
+          slidedown: {
+            enabled: true
           }
-        });
-      } else {
-        document.body.innerHTML = "<h2>Please enable notifications</h2>";
-        console.warn("User is not subscribed to notifications.");
-      }
+        }
+      });
+
+      // Automatically show the browser permission prompt
+      OneSignal.showSlidedownPrompt();
+
+      // When subscription state changes
+      OneSignal.on("subscriptionChange", function (isSubscribed) {
+        console.log("Subscription changed:", isSubscribed);
+
+        if (isSubscribed) {
+          OneSignal.getUserId().then(function (playerId) {
+            console.log("Player ID:", playerId);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get("userId");
+
+            if (userId && playerId) {
+              console.log("Sending to Google Apps Script...");
+              fetch("https://script.google.com/macros/s/AKfycbySkTTqF-tyPWtv3qrWWxxp1VrD4W2MyVPU1C1LCBI_MRn8sCtjtbvCD1igQ3ykIs86ag/exec", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userId, playerId })
+              })
+              .then(() => {
+                document.body.innerHTML = "<h2>✅ Device Registered Successfully</h2>";
+              })
+              .catch((error) => {
+                console.error("Error sending data:", error);
+                document.body.innerHTML = "<h2>❌ Failed to register device</h2>";
+              });
+            } else {
+              document.body.innerHTML = "<h2>⚠️ Missing userId or playerId</h2>";
+            }
+          });
+        } else {
+          document.body.innerHTML = "<h2>🔕 Notifications not enabled</h2>";
+        }
+      });
     });
-  });
-</script>
+  </script>
+</head>
+<body>
+  <h2>🔄 Setting up notifications...</h2>
+</body>
+</html>
