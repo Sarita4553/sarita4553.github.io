@@ -28,6 +28,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const userId = urlParams.get("userId");
+            console.log("User ID:", userId);
 
             if (playerId && userId) {
               fetch("https://hook.eu2.make.com/mefsr61we1suvzxqt6dvk93aqy18gcub", {
