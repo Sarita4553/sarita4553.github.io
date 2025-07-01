@@ -2,65 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Register for Push Notifications</title>
+  <title>Enable Push Notifications</title>
 
-  <!-- OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+  <!-- ✅ OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
   <script>
     window.OneSignal = window.OneSignal || [];
-
     OneSignal.push(function () {
-      console.log("Initializing OneSignal...");
-
       OneSignal.init({
         appId: "d2783680-973f-459a-8550-686b0f9c77b4",
+        notifyButton: { enable: false },
         promptOptions: {
-          slidedown: {
-            enabled: true
-          }
+          slidedown: { enabled: true }
         }
       });
 
       OneSignal.showSlidedownPrompt();
 
-      OneSignal.on("subscriptionChange", function (isSubscribed) {
-        console.log("Subscription changed:", isSubscribed);
-
+      OneSignal.on('subscriptionChange', function (isSubscribed) {
+        console.log("Subscribed:", isSubscribed);
         if (isSubscribed) {
           OneSignal.getUserId().then(function (playerId) {
             console.log("Player ID:", playerId);
 
             const urlParams = new URLSearchParams(window.location.search);
             const userId = urlParams.get("userId");
-            console.log("User ID:", userId);
 
-            if (userId && playerId) {
-              const endpoint = "https://script.google.com/macros/s/AKfycbxsmC2r4cBlJeuHOK-lY0jq3xKJi6cMlHusJ2_PlzcjIqRqfcQ0scOhx_-Db9ncoZaa1Q/exec";
-              const queryString = `?userId=${encodeURIComponent(userId)}&playerId=${encodeURIComponent(playerId)}`;
-
-              fetch(endpoint + queryString)
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log("Response:", data);
-                  document.body.innerHTML = "<h2>✅ Device Registered Successfully</h2>";
+            if (playerId && userId) {
+              fetch("https://hook.eu2.make.com/mefsr61we1suvzxqt6dvk93aqy18gcub", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  userId: userId,
+                  playerId: playerId
                 })
-                .catch((error) => {
-                  console.error("Error sending data:", error);
-                  document.body.innerHTML = "<h2>❌ Failed to register device</h2>";
-                });
+              })
+              .then(() => {
+                document.body.innerHTML = "<h2>✅ Registered Successfully!</h2>";
+              })
+              .catch(() => {
+                document.body.innerHTML = "<h2>❌ Failed to Register</h2>";
+              });
             } else {
               document.body.innerHTML = "<h2>⚠️ Missing userId or playerId</h2>";
             }
           });
-        } else {
-          document.body.innerHTML = "<h2>🔕 Notifications not enabled</h2>";
         }
       });
     });
   </script>
 </head>
 <body>
-  <h2>🔄 Setting up notifications...</h2>
+  <h2>🔄 Please allow notifications...</h2>
 </body>
 </html>
