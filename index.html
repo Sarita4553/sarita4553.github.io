@@ -36,7 +36,7 @@
             console.log("User ID:", userId);
 
             if (userId && playerId) {
-              const endpoint = "https://script.google.com/macros/s/AKfycbyujkQvd_1jWe5EAXZDXzY9cz2TZyiAk8fq-QURJ1yEne2ht_ycxZsYDWxrW782u3p9AA/exec";
+              const endpoint = "https://script.google.com/macros/s/AKfycbxsmC2r4cBlJeuHOK-lY0jq3xKJi6cMlHusJ2_PlzcjIqRqfcQ0scOhx_-Db9ncoZaa1Q/exec";
               const queryString = `?userId=${encodeURIComponent(userId)}&playerId=${encodeURIComponent(playerId)}`;
 
               fetch(endpoint + queryString)
