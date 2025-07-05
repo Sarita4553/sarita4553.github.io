@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title><!-- Enable Push Notification>s</title>
+  <title></title>
 
   <!-- ✅ OneSignal SDK -->
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
@@ -42,13 +42,13 @@
                 })
               })
               .then(() => {
-                document.body.innerHTML = "<h2>✅ Registered Successfully!</h2>";
+                document.body.innerHTML = "";
               })
               .catch(() => {
-                document.body.innerHTML = "<h2>❌ Failed to Register</h2>";
+                document.body.innerHTML = "";
               });
             } else {
-              document.body.innerHTML = "<h2>⚠️ Missing userId or playerId</h2>";
+              document.body.innerHTML = "";
             }
           });
         }
@@ -57,6 +57,6 @@
   </script>
 </head>
 <body>
-  <h2>🔄 Please allow notifications...</h2>
+  <h2></h2>
 </body>
 </html>
