@@ -2,79 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OneSignal Adalo Bridge</title>
-
-  <!-- ✅ OneSignal SDK -->
+  <title>Adalo Push Setup</title>
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
   <script>
     window.OneSignal = window.OneSignal || [];
+
     OneSignal.push(function () {
       const urlParams = new URLSearchParams(window.location.search);
       const userId = urlParams.get("userId");
-      console.log("Adalo User ID:", userId);
 
       if (!userId) {
-        console.error("Missing userId in URL query");
+        console.error("❌ Missing userId from URL");
         return;
       }
 
+      // Initialize OneSignal (NO Web Push features here)
       OneSignal.init({
         appId: "d2783680-973f-459a-8550-686b0f9c77b4",
-        notifyButton: { enable: false },
-        autoRegister: false,
-        promptOptions: {
-          slidedown: { enabled: false }
-        }
+        autoRegister: true,
+        notifyButton: { enable: false }
       });
 
-      // Manually prompt if not already subscribed
-      OneSignal.isPushNotificationsEnabled().then(function (enabled) {
-        if (!enabled) {
-          OneSignal.showSlidedownPrompt();
-        }
-      });
-
-      // Set external_user_id to match Adalo user
+      // Set external user ID for native push
       OneSignal.setExternalUserId(userId).then(() => {
-        console.log("External user ID set:", userId);
-      });
+        console.log("✅ external_user_id set to:", userId);
 
-      OneSignal.on('subscriptionChange', function (isSubscribed) {
-        console.log("Subscribed:", isSubscribed);
-        if (isSubscribed) {
-          OneSignal.getUserId().then(function (playerId) {
-            console.log("Player ID:", playerId);
-
-            if (playerId && userId) {
-              fetch("https://hook.eu2.make.com/cpgzvdklfisuk4kk72snm9jnptocpey1", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                  userId: userId,
-                  playerId: playerId
-                })
+        // Get playerId and send to Make webhook
+        OneSignal.getUserId().then(function (playerId) {
+          if (playerId) {
+            fetch("https://hook.eu2.make.com/YOUR-MAKE-WEBHOOK", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: userId,
+                playerId: playerId
               })
-              .then(() => {
-                document.body.innerHTML = "";
-              })
-              .catch((err) => {
-                console.error("Webhook error:", err);
-                document.body.innerHTML = "";
-              });
-            } else {
-              console.error("Missing playerId or userId");
-              document.body.innerHTML = "";
-            }
-          });
-        }
+            }).then(() => {
+              document.body.innerHTML = "<h3>✅ Registered successfully!</h3>";
+            }).catch(() => {
+              document.body.innerHTML = "<h3>⚠️ Failed to register</h3>";
+            });
+          }
+        });
       });
     });
   </script>
 </head>
-<body>
-  <h2 style="font-family: sans-serif; color: #555;">Setting up push notifications...</h2>
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;">
+  <h3 style="font-family:sans-serif;color:#555;">Registering for notifications...</h3>
 </body>
 </html>
