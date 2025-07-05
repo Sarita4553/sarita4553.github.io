@@ -2,54 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Adalo Push Setup</title>
+  <title></title>
+
+  <!-- ✅ OneSignal SDK -->
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
   <script>
     window.OneSignal = window.OneSignal || [];
-
     OneSignal.push(function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const userId = urlParams.get("userId");
-
-      if (!userId) {
-        console.error("❌ Missing userId from URL");
-        return;
-      }
-
-      // Initialize OneSignal (NO Web Push features here)
       OneSignal.init({
         appId: "d2783680-973f-459a-8550-686b0f9c77b4",
-        autoRegister: true,
-        notifyButton: { enable: false }
+        notifyButton: { enable: false },
+        promptOptions: {
+          slidedown: { enabled: true }
+        }
       });
 
-      // Set external user ID for native push
-      OneSignal.setExternalUserId(userId).then(() => {
-        console.log("✅ external_user_id set to:", userId);
+      OneSignal.showSlidedownPrompt();
 
-        // Get playerId and send to Make webhook
-        OneSignal.getUserId().then(function (playerId) {
-          if (playerId) {
-            fetch("https://hook.eu2.make.com/YOUR-MAKE-WEBHOOK", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: userId,
-                playerId: playerId
+      OneSignal.on('subscriptionChange', function (isSubscribed) {
+        console.log("Subscribed:", isSubscribed);
+        if (isSubscribed) {
+          OneSignal.getUserId().then(function (playerId) {
+            console.log("Player ID:", playerId);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get("userId");
+            console.log("User ID:", userId);
+
+            if (playerId && userId) {
+              fetch("https://hook.eu2.make.com/cpgzvdklfisuk4kk72snm9jnptocpey1", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  userId: userId,
+                  playerId: playerId
+                })
               })
-            }).then(() => {
-              document.body.innerHTML = "<h3>✅ Registered successfully!</h3>";
-            }).catch(() => {
-              document.body.innerHTML = "<h3>⚠️ Failed to register</h3>";
-            });
-          }
-        });
+              .then(() => {
+                document.body.innerHTML = "";
+              })
+              .catch(() => {
+                document.body.innerHTML = "";
+              });
+            } else {
+              document.body.innerHTML = "";
+            }
+          });
+        }
       });
     });
   </script>
 </head>
-<body style="display:flex;justify-content:center;align-items:center;height:100vh;">
-  <h3 style="font-family:sans-serif;color:#555;">Registering for notifications...</h3>
+<body>
+  <h2></h2>
 </body>
 </html>
