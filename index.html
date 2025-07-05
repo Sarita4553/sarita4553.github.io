@@ -20,6 +20,11 @@
 
       OneSignal.showSlidedownPrompt();
 
+      // Set external_user_id to match Adalo user
+      OneSignal.setExternalUserId(userId).then(() => {
+        console.log("External user ID set:", userId);
+      });
+
       OneSignal.on('subscriptionChange', function (isSubscribed) {
         console.log("Subscribed:", isSubscribed);
         if (isSubscribed) {
