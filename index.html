@@ -2,10 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Craftorama Notifications</title>
+  
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
 
-  <!-- ✅ OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+  <!-- Custom Styles -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      max-width: 500px;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #6C63FF;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-top: 0;
+    }
+
+    .loading {
+      margin-top: 20px;
+      font-style: italic;
+      color: #888;
+    }
+  </style>
 
   <script>
     window.OneSignal = window.OneSignal || [];
@@ -31,6 +74,8 @@
             console.log("User ID:", userId);
 
             if (playerId && userId) {
+              document.getElementById("loading").textContent = "Linking your device for notifications...";
+
               fetch("https://hook.eu2.make.com/cpgzvdklfisuk4kk72snm9jnptocpey1", {
                 method: "POST",
                 headers: {
@@ -42,13 +87,11 @@
                 })
               })
               .then(() => {
-                document.body.innerHTML = "";
+                document.getElementById("loading").textContent = "All set! You're now subscribed to Craftorama updates.";
               })
               .catch(() => {
-                document.body.innerHTML = "";
+                document.getElementById("loading").textContent = "Oops! Something went wrong. Try again later.";
               });
-            } else {
-              document.body.innerHTML = "";
             }
           });
         }
@@ -57,6 +100,10 @@
   </script>
 </head>
 <body>
-  <h2></h2>
+  <div class="container">
+    <h1>Welcome to Craftorama!</h1>
+    <p>Enable notifications to stay updated with our latest creative deals, tips, and product launches.</p>
+    <div id="loading" class="loading">Initializing notification setup...</div>
+  </div>
 </body>
 </html>
